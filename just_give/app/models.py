@@ -1,3 +1,38 @@
-from django.db import models
+from .database import Base
+from sqlalchemy import Column, ForeignKey, Integer, String, Boolean
+from sqlalchemy.sql.sqltypes import TIMESTAMP
+from sqlalchemy.sql.expression import text
+from sqlalchemy.schema import PrimaryKeyConstraint
 
-# Create your models here.
+
+class Post(Base):
+    __tablename__ = "posts"
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    title = Column(String, nullable=False)
+    published = Column(Boolean, nullable=False, server_default="TRUE")
+    created_at = Column(
+        TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
+    )
+    owner_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    email = Column(String, nullable=False, unique=True)
+    password = Column(String, nullable=False)
+    date_registered = Column(
+        TIMESTAMP(timezone=True), nullable=False, server_default=text("now()")
+    )
+    region = Column(Integer, nullable=False)
+    phone_number = Column(Integer, nullable=False)
+    verified = Column(Boolean, nullable=False, server_default="FALSE")
+    date_verified = Column(
+            TIMESTAMP(timezone=True), nullable=True, server_default=None
+        )
+
+
